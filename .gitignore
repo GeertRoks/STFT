@@ -1,2 +1,6 @@
 stft
 *.o
+*.dat
+*.png
+
+fftw-3.3.8/

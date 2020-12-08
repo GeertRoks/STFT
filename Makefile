@@ -1,9 +1,9 @@
 PRGRM = stft
-OBJ = main.o
+OBJ = main.o playsoundfile/playfile.o plot/plot.o
 
 CXXFLAGS := -Wall -std=c++11
 CXXFLAGS +=
-LDFLAGS =
+LDFLAGS = -lfftw3 -lm -lsndfile
 LDLIBS =
 
 all: $(PRGRM)
