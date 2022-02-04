@@ -1,53 +1,31 @@
+
 #include <iostream>
-#include <fftw3.h>
-#include "playsoundfile/playfile.hpp"
-#include "plot/plot.hpp"
+
+#include <kfr/all.hpp>
+
+#define KFR_DFT_MULTI 0
 
 int main() {
 
-    Playfile file("flute-c4.wav");
-    Plot plot("flute-c4.dat");
+    std::cout << "Hello stft" << std::endl;
 
-    double *in;
-    double *X_mag, *X_phase;
-    fftw_complex *out;
-    fftw_plan p;
-    unsigned int M = 511;
-    unsigned int N = 512;
-    unsigned int offset = 44100;
+    // Open file as sequence of float`s, conversion is performed internally
+    kfr::audio_reader_wav<double> reader(kfr::open_file_for_reading("flute-c4.wav"));
+    kfr::univector2d<double> audio = reader.read_channels();
 
-    in = (double*) fftw_malloc(sizeof(double) * N);
-    X_mag = (double*) fftw_malloc(sizeof(double) * N);
-    X_phase = (double*) fftw_malloc(sizeof(double) * N);
+    plot_show("Flute c4", audio[0], "title='name', div_by_N=True");
 
-    for (unsigned int i = 0; i < M; i++) {
-        in[i] = static_cast<double>(file.getSample(i + offset));
+    kfr::dft_plan_real<double> plan(1024);
+    kfr::univector<double, 1024> in;
+    kfr::univector<kfr::complex<double>,1024> out;
+    for (unsigned int i = 0; i < 1024; i++) {
+        in[i] = audio[0][i];
     }
 
-    out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-    p = fftw_plan_dft_r2c_1d(N, in, out, FFTW_ESTIMATE);
 
-    fftw_execute(p);
+    kfr::univector<kfr::u8> temp(plan.temp_size);
+    plan.execute(out, in, temp);
 
-    for (unsigned int i = 0; i < N; i++) {
-        X_mag[i] = out[i][0];
-        X_phase[i] = out[i][1];
-    }
-
-    for (unsigned int i = 0; i < N; i++) {
-        std::cout << i << ": " << out[i][0] << ", " << out[i][1] << std::endl;
-    }
-
-    plot.setSize(N);
-    plot.signalName("Audio signal");
-    plot.writeToFile(in);
-
-    plot.signalName("FFT");
-    plot.writeToFile(X_phase);
-
-    fftw_destroy_plan(p);
-    fftw_free(in);
-    fftw_free(out);
 
     return 0;
 }

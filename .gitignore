@@ -4,3 +4,6 @@ stft
 *.png
 
 fftw-3.3.8/
+
+dspplot/dspplot/__init__.py
+dspplot/dspplot/__pycache__/

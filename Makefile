@@ -1,10 +1,10 @@
 PRGRM = stft
-OBJ = main.o playsoundfile/playfile.o plot/plot.o
+OBJ = main.o
 
-CXXFLAGS := -Wall -std=c++11
+CXXFLAGS := -Wall -std=c++17
 CXXFLAGS +=
-LDFLAGS = -lfftw3 -lm -lsndfile
-LDLIBS =
+LDFLAGS = -lkfr_dft -lkfr_io
+LDLIBS = -I/usr/include/kfr/
 
 all: $(PRGRM)
 
